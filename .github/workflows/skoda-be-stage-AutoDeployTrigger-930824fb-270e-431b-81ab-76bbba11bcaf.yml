@@ -19,6 +19,7 @@ jobs:
     permissions: 
       id-token: write #This is required for requesting the OIDC JWT Token
       contents: read #Required when GH token is used to authenticate with private repo
+    environment: stage
 
     steps:
       - name: Checkout to the branch
@@ -42,6 +43,10 @@ jobs:
           containerAppName: skoda-be-stage
           resourceGroup: SkodaTaskStage
           imageToBuild: skodataskcontainerregistry.azurecr.io/skoda-be-stage:${{ github.sha }}
+          environmentVariables: |
+            SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}
+            SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+            SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}
           _buildArgumentsKey_: |
             _buildArgumentsValues_
 
