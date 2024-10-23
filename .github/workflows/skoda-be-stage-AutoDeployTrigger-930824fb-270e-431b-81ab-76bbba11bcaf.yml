@@ -1,0 +1,48 @@
+name: Trigger auto deployment for skoda-be-stage
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ master ]
+    paths:
+    - '**'
+    - '.github/workflows/skoda-be-stage-AutoDeployTrigger-930824fb-270e-431b-81ab-76bbba11bcaf.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.SKODABESTAGE_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.SKODABESTAGE_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.SKODABESTAGE_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/src/main/resources 
+          _dockerfilePathKey_: _dockerfilePath_
+          registryUrl: skodataskcontainerregistry.azurecr.io
+          registryUsername: ${{ secrets.SKODABESTAGE_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.SKODABESTAGE_REGISTRY_PASSWORD }}
+          containerAppName: skoda-be-stage
+          resourceGroup: SkodaTaskStage
+          imageToBuild: skodataskcontainerregistry.azurecr.io/skoda-be-stage:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
