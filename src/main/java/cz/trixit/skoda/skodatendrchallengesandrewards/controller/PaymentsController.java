@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tags;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,7 +21,7 @@ public class PaymentsController {
     private final StripeClient stripeClient;
 
     @PostMapping(value = "/payments/initiate", produces = "application/json")
-    public String initiate(PaymentIntentDto paymentIntentDto) throws StripeException {
+    public String initiate(@RequestBody() PaymentIntentDto paymentIntentDto) throws StripeException {
         PaymentIntentCreateParams params =
                 PaymentIntentCreateParams
                         .builder()
