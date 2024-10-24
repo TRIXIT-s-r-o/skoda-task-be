@@ -1,0 +1,48 @@
+name: Trigger auto deployment for skoda-be-prod
+
+# When this action will be executed
+on:
+  # Automatically trigger it when detected changes in repo
+  push:
+    branches: 
+      [ master ]
+    paths:
+    - '**'
+    - '.github/workflows/skoda-be-prod-AutoDeployTrigger-b8e21b54-369c-4987-b2fc-657bb2c9a2b8.yml'
+
+  # Allow manual trigger 
+  workflow_dispatch:      
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions: 
+      id-token: write #This is required for requesting the OIDC JWT Token
+      contents: read #Required when GH token is used to authenticate with private repo
+
+    steps:
+      - name: Checkout to the branch
+        uses: actions/checkout@v2
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.SKODABEPROD_AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.SKODABEPROD_AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.SKODABEPROD_AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}
+          _dockerfilePathKey_: _dockerfilePath_
+          registryUrl: 
+          registryUsername: ${{ secrets.SKODABEPROD_REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.SKODABEPROD_REGISTRY_PASSWORD }}
+          containerAppName: skoda-be-prod
+          resourceGroup: SkodaTaskProd
+          imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
+
+
