@@ -3,7 +3,7 @@
 ## Backend
 
 ## Deployment  & CI/CD
-- Project is automatically deployed to Azure. F Container app.
+- Project is automatically deployed as an Azure Container App.
 - Each push to the master branch is **automatically** deployed to the stage environment, pipeline for the production must be **manually** started.
 
 
