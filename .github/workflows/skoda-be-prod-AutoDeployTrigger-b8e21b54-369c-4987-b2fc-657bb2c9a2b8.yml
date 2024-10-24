@@ -42,6 +42,7 @@ jobs:
           containerAppName: skoda-be-prod
           resourceGroup: SkodaTaskProd
           imageToBuild: default/[parameters('containerAppName')]:${{ github.sha }}
+          environmentVariables: "SPRING_DATASOURCE_URL=${{ secrets.SKODASTAGE_SPRING_DATASOURCE_URL }} SPRING_DATASOURCE_PASSWORD=${{ secrets.SKODASTAGE_SPRING_DATASOURCE_PASSWORD }} SPRING_DATASOURCE_USERNAME=${{ secrets.SKODASTAGE_SPRING_DATASOURCE_USERNAME }}"
           _buildArgumentsKey_: |
             _buildArgumentsValues_
 
